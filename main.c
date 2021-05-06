@@ -21,29 +21,29 @@ int main(int argc, char *argv[]) {
         {
             case 'p':
                 sprintf(filenamePath,"/etc/apptimerec/times_%02d_%02d_%02d",local->tm_mday,local->tm_mon+1,local->tm_year+1900);
-                CTRLSYS(fdtimes = open(filenamePath,O_RDONLY),"error opening today file",TRUE,FALSE);
+                CTRLSYS(fdtimes = open(filenamePath,O_RDONLY),"error opening today file",TRUE,TRUE);
                 while ((read(fdtimes, buf, 1024)) > 0)
                     printf("%s",buf);
                 return 0;
             case 'a':
-                creat("/etc/apptimerec/trackproc",SSS);
-                fd = open("/etc/apptimerec/trackproc",O_WRONLY);
+                CTRLSYS(creat("/etc/apptimerec/trackproc",SSS),"failed to create trackprog file",TRUE,TRUE);
+                CTRLSYS((fd = open("/etc/apptimerec/trackproc",O_WRONLY)),"failed to open trackprog file",TRUE,TRUE);
                 listaddproc = strspl(optarg,  ' ' , &howmanyproc);
                 for(int i = 0; i < howmanyproc;i++) {
-                    write(fd, listaddproc[i], strlng(listaddproc[i]));
-                    write(fd," ",1);
+                    CTRLSYS(write(fd, listaddproc[i], strlng(listaddproc[i])),"failed to write to trackprog file",TRUE,TRUE);
+                    CTRLSYS(write(fd," ",1),"failed to write to trackprog file",TRUE,TRUE);
                 }
                 break;
             case 'u':
-                creat("/etc/apptimerec/users",SSS);
-                fd = open("/etc/apptimerec/users",O_WRONLY);
-                write(fd,optarg, strlng(optarg));
+                CTRLSYS(creat("/etc/apptimerec/users",SSS),"failed to create users file",TRUE,TRUE);
+                CTRLSYS((fd = open("/etc/apptimerec/users",O_WRONLY)),"failed to open users file",TRUE,TRUE);
+                CTRLSYS(write(fd,optarg, strlng(optarg)),"failed to write to users file",TRUE,TRUE);
                // uid = getpwnam(optarg)->pw_uid;
                 break;
             case 's':
-                creat("/etc/apptimerec/sample",SSS);
-                fd = open("/etc/apptimerec/sample",O_WRONLY);
-                write(fd,optarg, strlng(optarg));
+                CTRLSYS(creat("/etc/apptimerec/sample",SSS),"failed to create sample rate file",TRUE,TRUE);
+                CTRLSYS((fd = open("/etc/apptimerec/sample",O_WRONLY)),"failed to open sample rate file" ,TRUE,TRUE);
+                CTRLSYS(write(fd,optarg, strlng(optarg)),"failed to write to sample rate file",TRUE,TRUE);
                 sample = atoi(optarg);
                 break;
             case '?':
@@ -83,12 +83,12 @@ int main(int argc, char *argv[]) {
 
     //start today file
     sprintf(filenamePath,"/etc/apptimerec/times_%02d_%02d_%02d",local->tm_mday,local->tm_mon+1,local->tm_year+1900);
-    creat(filenamePath,SSS);
-    CTRLSYS(fdtimes = open(filenamePath,O_WRONLY),"error opening today file",TRUE,FALSE);
+    CTRLSYS(creat(filenamePath,SSS),"failed to create today file, make sure to run with sudo",TRUE,TRUE);
+    CTRLSYS(fdtimes = open(filenamePath,O_WRONLY),"failed to open today file,  make sure to run with sudo",TRUE,TRUE);
 
     //get configuration
     //get processes to track
-    fd = open("/etc/apptimerec/trackproc",O_RDONLY);
+    CTRLSYS((fd = open("/etc/apptimerec/trackproc",O_RDONLY)),"failed to open trackproc while getting the configuration",TRUE,TRUE);
     while ((nread = read(fd, buf, 2048)) > 0) {
         strcpy(trackprog, buf);
     }
@@ -96,12 +96,12 @@ int main(int argc, char *argv[]) {
     listaddproc = strspl(trackprog,  ' ' , &howmanyproc);
     //get users
     buf[0] = '\0';
-    fd = open("/etc/apptimerec/users",O_RDONLY);
+    CTRLSYS((fd = open("/etc/apptimerec/users",O_RDONLY)),"failed to open users while getting the configuration",TRUE,TRUE);
     while ((nread = read(fd, users, 2048)) > 0) {
         uid = getpwnam(users)->pw_uid;
     }
     //get sample time
-    fd = open("/etc/apptimerec/sample",O_RDONLY);
+    CTRLSYS((fd = open("/etc/apptimerec/sample",O_RDONLY)),"failed to open trackproc while getting the configuration",TRUE,TRUE);
     while ((nread = read(fd, samples, 2048)) > 0) {
         sample = atoi(samples);
     }
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     while(TRUE) {
         fp = fopen(filenamePath,"w");
         fclose(fp);
-        CTRLSYS(fdtimes = open(filenamePath,O_WRONLY),"error opening today file",TRUE,FALSE);
+        CTRLSYS(fdtimes = open(filenamePath,O_WRONLY),"error opening today file",TRUE,TRUE);
         int nproctmp=0;
         int index;
         struct apptimerec tmp[1000];
@@ -148,12 +148,12 @@ int main(int argc, char *argv[]) {
 
                 sprintf(statfilePath, "/proc/%s/stat", direntry->d_name);
                 sprintf(loginuidfilePath, "/proc/%s/loginuid", direntry->d_name);
-                CTRLSYS((statfd = open(statfilePath, O_RDONLY)), "error opening a stat file", FALSE, FALSE);
-                CTRLSYS((int) (n = read(statfd, statline, 1000)), "error while getting process name", FALSE, FALSE);
-                CTRLSYS((loginuidfd = open(loginuidfilePath, O_RDONLY)), "error opening a loginuid file", FALSE, FALSE);
+                CTRLSYS((statfd = open(statfilePath, O_RDONLY)), "error opening a stat file", FALSE, TRUE);
+                CTRLSYS((int) (n = read(statfd, statline, 1000)), "error while getting process name", FALSE, TRUE);
+                CTRLSYS((loginuidfd = open(loginuidfilePath, O_RDONLY)), "error opening a loginuid file", FALSE, TRUE);
                 statline[n] = '\0';
                 statlineSplit = strspl(statline, ' ', NULL);
-                CTRLSYS((int) (n = read(loginuidfd, uidread, 100)), "error while getting process name", FALSE, FALSE);
+                CTRLSYS((int) (n = read(loginuidfd, uidread, 100)), "error while getting process name", FALSE, TRUE);
                 uidread[n] = '\0';
                 procuid = atoi(uidread);
                 if(statlineSplit !=  NULL)
@@ -167,16 +167,13 @@ int main(int argc, char *argv[]) {
                 if ((strcmp(processname, "") != 0) && (procuid == uid) &&
                     (belongsToList(listaddproc, processname, howmanyproc))) {
 
-                    // pid = atoi(statlineSplit[0]);
                     starttime = atoi(statlineSplit[21]);
                     totalsec = (uptime - (starttime / HZ));
-                    //printf("Process Time:%d\n",totalsec);
                     hours = (int) totalsec / 3600;
                     min = ((int) totalsec - hours * 3600) / 60;
                     sec = (int) totalsec - hours * 3600 - min * 60;
                     if (!exists(tmp, processname, nproctmp)) {
-                        //printf("new process added");
-                        //record[nproc].pid = pid;
+                        //add process to list
                         strcpy(tmp[nproctmp].name, processname);
                         tmp[nproctmp].hours = hours;
                         tmp[nproctmp].mins = min;
@@ -184,26 +181,24 @@ int main(int argc, char *argv[]) {
                         tmp[nproctmp].starttime = starttime;
                         nproctmp++;
                     } else if (!isNewSession(tmp, processname, starttime, nproctmp, &index)) {
-                        //printf("reopened a process");
+                        //get older process with same cmd
                         tmp[index].sec = sec;
                         tmp[index].mins = min;
                         tmp[index].hours = hours;
                         tmp[index].starttime = starttime;
                     } else {
-                        //printf("still active");
+                        //just update
                         tmp[index].hours = hours;
                         tmp[index].mins = min;
                         tmp[index].sec = sec;
 
                     }
-                    //printf("%d:%d:%d\n", hours, min, sec);
                 }
             }
         }
         for(int i = 0; i < nproctmp;i++) {
             if (!exists(record, tmp[i].name, nproc)) {
-                //printf("new process added");
-                //record[nproc].pid = pid;
+                //add to list
                 strcpy(record[nproc].name, tmp[i].name);
                 record[nproc].hours = tmp[i].hours;
                 record[nproc].mins = tmp[i].mins;
@@ -211,7 +206,7 @@ int main(int argc, char *argv[]) {
                 record[nproc].starttime = tmp[i].starttime;
                 nproc++;
             } else if (isNewSession(record, tmp[i].name, tmp[i].starttime, nproc, &index)) {
-                //printf("reopened a process");
+                //check if closed and reopened
                 record[index].sec += tmp[i].sec;
                 if(record[index].sec >= 60) {
                     record[index].sec -= 60;
@@ -229,7 +224,7 @@ int main(int argc, char *argv[]) {
                 record[index].hours += tmp[i].hours;
                 record[index].starttime = tmp[i].starttime;
             } else {
-                //printf("still active");
+                //still running, update with sample rate
                     record[index].sec += sample;
                     if(record[index].sec >= 60) {
                         record[index].sec -= 60;
@@ -241,13 +236,11 @@ int main(int argc, char *argv[]) {
                     }
 
             }
-                //printf("%d:%d:%d\n", hours, min, sec);
-
         }
         char proc[1000];
         for(int i = 0; i < nproc;i++){
             sprintf(proc,"%s \t\t\t %d:%d:%d \t\t\t %ld\n", record[i].name,record[i].hours, record[i].mins, record[i].sec,record[i].starttime);
-            CTRLSYS((int)(write(fdtimes,proc, strlng(proc))),"error writing on times file",TRUE,FALSE); //error here
+            CTRLSYS((int)(write(fdtimes,proc, strlng(proc))),"error writing on times file",TRUE,TRUE);
         }
         nproctmp = 0;
         sleep(sample);
