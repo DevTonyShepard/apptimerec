@@ -1,12 +1,6 @@
 #include "utils.h"
 
-/**
- *
- * @param x
- * @param s
- * @param DO_OR_DIE
- * @param isdaemon
- */
+
 void CTRLSYS(int x,char * s,int DO_OR_DIE,int isdaemon){
     if ((x) < 0) {
         if(isdaemon == TRUE)
@@ -16,11 +10,7 @@ void CTRLSYS(int x,char * s,int DO_OR_DIE,int isdaemon){
         if(DO_OR_DIE) exit(errno);
     }
 }
-/**
- *
- * @param str
- * @param c
- */
+
 void remove_all_chars(char* str, char c) {
     char *pr = str, *pw = str;
     while (*pr) {
@@ -29,24 +19,14 @@ void remove_all_chars(char* str, char c) {
     }
     *pw = '\0';
 }
-/**
- *
- * @param str
- * @return
- */
+
 int strlng(char * str){
     char * ch;
     int out;
     for(ch = str, out=0;*ch != '\0';ch++,out++);
     return out;
 }
-/**
- *
- * @param str
- * @param target
- * @param inst
- * @return
- */
+
 int chpos(char * str, char target,int inst){
     char * ch;
     int out,founds=0;
@@ -58,13 +38,7 @@ int chpos(char * str, char target,int inst){
             return -1;
     return out;
 }
-/**
- * splits a string into substrings based on the delimiter
- * @param str the whole string
- * @param dlm delimier
- * @param n_sstr_o how many substing if initually null, it will not r
- * @return the splitted sting
- */
+
 char ** strspl(char * str,char dlm,int * n_sstr_o){
     char ** out;
     char * ch;
@@ -91,11 +65,7 @@ char ** strspl(char * str,char dlm,int * n_sstr_o){
     }
     return out;
 }
-/**
- * checks if a string is a number
- * @param string
- * @return true or false
- */
+
 int isNumber(char * string){
     for(int i = 0; i < strlng(string);i++)
         if(string[i] < '0' || string[i] > '9')
@@ -103,13 +73,7 @@ int isNumber(char * string){
     return TRUE;
 }
 
-/**
- *
- * @param list
- * @param string
- * @param n
- * @return
- */
+
 int belongsToList(char ** list, char * string, int n){
     for(int i = 0; i < n; i++)
         if(strcmp(list[i], string) == 0) {
@@ -118,10 +82,7 @@ int belongsToList(char ** list, char * string, int n){
     return FALSE;
 
 }
-/**
- * deamonize a process.
- * @param cmd the process executable name (pass argv[0])
- */
+
 void daemonize(const char *cmd)
 {
     int i, fd0, fd1, fd2;
