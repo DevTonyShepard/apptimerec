@@ -1,0 +1,13 @@
+#! /bin/bash
+echo -n "Do you want to add this folder to your PATH (1) or to put the executable on your /bin/ (2)folder?(answer 1 or 2)"
+read;
+if [ ${REPLY} = "1" ]
+then
+	echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
+	echo "restart your terminal"
+elif [ ${REPLY} = "2" ]
+then
+	sudo mv apptimerec /bin/apptimerec
+else
+	echo "please answer with 1 or 2"
+fi
