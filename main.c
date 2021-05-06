@@ -1,3 +1,10 @@
+/**
+ * AppTimeRec
+ * @copyright Copyright (c) 2021 DevTonyShepard
+ * @author Antonio "Shepard"
+ * GNU General Public License v3.0
+ * @brief Daemon written in C to track process time day by day
+ */
 #include "lib/apptimerec.h"
 #include "lib/utils.h"
 
