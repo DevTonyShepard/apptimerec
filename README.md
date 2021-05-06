@@ -37,10 +37,25 @@ chmod +x install
 ./install
 ```
 ## Explanation
-something
+First you need to configure the daemon
+```
+sudo apptimerec -u [username] -a [process list separated by space] -s [sample time in seconds]
+```
+-u option to filter for a specific user's processes
+-a the list of the processes executable names to track (use top command and copy the name under COMMAND)
+-s how many time the times file need to be updated
 
+then just start the daemon
+```
+sudo apptimerec
+```
+
+to check times use 
+```
+sudo apptimerec -p
+```
 ## Future developement
-something
+Bugfixes and more option
 
 ## Built With
 * [Clion](https://www.jetbrains.com/clion/) - IDE
